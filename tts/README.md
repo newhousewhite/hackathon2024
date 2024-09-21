@@ -25,3 +25,9 @@ This script mounts the following:
 - The flask script `app.py` for easy edits
 - The external reference wavs to condition the voice on.
 - The tts model folder to persist on drive, so that no re-downloads happen.
+
+### TTS API
+
+```
+curl -X POST -H "Content-Type: application/json" -d '{"text": "Hello, how are you? I want to go to the playground with you.", "lang":"en"}' http://localhost:5000/tts -o out.wav
+```
