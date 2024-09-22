@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 import os
 import requests
 from werkzeug.utils import secure_filename
@@ -14,6 +14,7 @@ openai.api_key = OPENAI_API_KEY
 
 # RAG API 엔드포인트
 STT_API_URL = 'https://api.openai.com/v1/audio/transcriptions'  # 올바른 Whisper STT URL
+TTS_API_URL = 'http://localhost:5000/tts'  # 올바른 Whisper STT URL
 
 # HTML 페이지 렌더링
 @app.route('/')
@@ -46,6 +47,14 @@ def upload_audio():
         return jsonify({'response': rag_response['answer']})
     else:
         return jsonify({'error': 'Error in RAG processing'}), 500
+
+    # Step 4: Call TTS to generate response audio
+    tts_response = send_to_tts(rag_response["answer"], "ko")
+    if tts_response:
+        return Response(tts_response, mimetype="audio/wav")
+    else:
+        return jsonify({'error': 'Error in RAG processing'}), 500
+    
 
 def get_next_filename():
     """저장할 파일 이름을 순차적으로 결정하는 함수"""
@@ -88,6 +97,17 @@ def send_to_rag(transcript):
     except Exception as e:
         print(f"Error in RAG Flask: {e}")
         return None
+
+def send_to_tts(text, lang):
+    headers = {"Content-Type": "application/json"}
+    data = {"text": text, "lang": lang}
+
+    response = requests.post(TTS_API_URL, headers=headers, json=data)
+
+    if response.status_code == 200:
+        return response.content  # Returns the WAV file data
+    else:
+        raise Exception(f"Error calling TTS: {response.text}")
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
