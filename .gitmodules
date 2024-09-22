@@ -1,0 +1,3 @@
+[submodule "front-end-rag"]
+	path = front-end-rag
+	url = git@github.com:ALLAVO/Hackathon_MyAiGrandma.git

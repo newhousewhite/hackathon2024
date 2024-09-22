@@ -1,0 +1,8 @@
+langchain
+faiss-cpu
+langchain-google-genai
+gpt4all
+langchain-community
+flask
+requests
+openai
