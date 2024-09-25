@@ -5,13 +5,13 @@ os.environ['OPENBLAS_NUM_THREADS'] = '1'
 from flask import Flask, request, jsonify, send_file
 import requests
 from TTS.api import TTS
-tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2", gpu=False)
+tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2", gpu=True)
 
 
 ref_wavs = []
 for f in glob.glob("/data/wavs/*.wav"):
     ref_wavs.append(f)
-ref_wavs = ref_wavs[:20]
+ref_wavs = ref_wavs[:5]
 
 app = Flask(__name__)
 
@@ -19,6 +19,7 @@ app = Flask(__name__)
 def generate_tts():
     text = request.json['text']
     lang = request.json['lang']
+    print(text, lang, flush=True)
 
     # generate speech by cloning a voice using default settings
     tts.tts_to_file(text=text,
@@ -35,4 +36,4 @@ def generate_tts():
         return jsonify({"error": "Error generating TTS"})
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True)
