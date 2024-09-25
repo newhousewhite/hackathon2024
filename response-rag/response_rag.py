@@ -7,6 +7,8 @@ from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_text_splitters import CharacterTextSplitter
+from langchain_core.output_parsers.json import parse_json_markdown
+
 import os
 
 # Flask 애플리케이션 생성
@@ -33,7 +35,8 @@ vectorstore = FAISS.from_documents(split_documents, embeddings)
 prompt_template = """
 You are a Grandma. talking to their grandchild, based on the information retrieved from the context in which you are SPEAKER_01
 Respond using only the provided context and chat history, and give an answer to the user's question.
-Respond back in Korean only. Don't use any english.
+Respond in a json containing the 2 fields text and lang, for the text body of response and language of response.
+Language should be indicated using a 2 letter code e.g. en for english and ko for korean etc.
 
 Context: {context}
 
@@ -73,4 +76,4 @@ def rag_endpoint(query, mood="neutral"):
     # RAG 검색 및 답변 생성
     res = retrieval_chain.invoke({"input": query, "mood": mood})
     # 응답 텍스트 반환
-    return({'answer': res['answer']})
+    return({'answer': parse_json_markdown(res['answer'])})

@@ -14,7 +14,7 @@ openai.api_key = OPENAI_API_KEY
 
 # RAG API 엔드포인트
 STT_API_URL = 'https://api.openai.com/v1/audio/transcriptions'  # 올바른 Whisper STT URL
-TTS_API_URL = 'http://localhost:5000/tts'  # 올바른 Whisper STT URL
+TTS_API_URL = 'http://localhost:5000/tts'  # 올바른 XTTS URL
 
 # HTML 페이지 렌더링
 @app.route('/')
@@ -43,10 +43,10 @@ def upload_audio():
 
     # Step 3: RAG Flask에 텍스트 전송
     rag_response = send_to_rag(transcript)
-    if rag_response:
-        return jsonify({'response': rag_response['answer']})
-    else:
-        return jsonify({'error': 'Error in RAG processing'}), 500
+    # if rag_response:
+    #     return jsonify({'response': rag_response['answer']})
+    # else:
+    #     return jsonify({'error': 'Error in RAG processing'}), 500
 
     # Step 4: Call TTS to generate response audio
     tts_response = send_to_tts(rag_response["answer"], "ko")
@@ -100,7 +100,7 @@ def send_to_rag(transcript):
 
 def send_to_tts(text, lang):
     headers = {"Content-Type": "application/json"}
-    data = {"text": text, "lang": lang}
+    data = text
 
     response = requests.post(TTS_API_URL, headers=headers, json=data)
 
