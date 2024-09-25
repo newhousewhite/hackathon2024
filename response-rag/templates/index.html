@@ -69,6 +69,7 @@
     <img src="{{ url_for('static', filename='image/mic.png') }}" alt="Stop Recording">
 </button>
 <audio id="audio-playback" controls></audio>
+<audio id="audioElement" controls></audio>
 <div id="response"></div>
 
 <script src="{{ url_for('static', filename='recorder.js') }}"></script>
@@ -98,14 +99,22 @@
                     method: 'POST',
                     body: formData,
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('response').textContent = data.response || data.error;
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const audioUrl = URL.createObjectURL(blob); // Create a URL for the blob
+                        const audioElement = document.getElementById('audioElement');
+                        audioElement.src = audioUrl;
+                        audioElement.play();
+                        // document.getElementById('response').textContent = data.response || data.error;
                     })
-                    .catch(err => {
-                        console.error('Error uploading audio:', err);
-                        alert('Error uploading audio. Please try again.');
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('response').textContent = 'Error uploading audio';
                     });
+                    // .catch(err => {
+                    //     console.error('Error uploading audio:', err);
+                    //     alert('Error uploading audio. Please try again.');
+                    // });
             };
 
             mediaRecorder.start();

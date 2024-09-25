@@ -23,14 +23,26 @@ document.getElementById('start-recording').addEventListener('click', async () =>
                 method: 'POST',
                 body: formData,
             })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('response').textContent = data.response || data.error;
+                .then(response => response.blob())
+                .then(blob => {
+                    const audioUrl = URL.createObjectURL(blob); // Create a URL for the blob
+                    const audioElement = document.getElementById('audioElement');
+                    audioElement.src = audioUrl;
+                    audioElement.play();
+                    // document.getElementById('response').textContent = data.response || data.error;
                 })
-                .catch(err => {
-                    console.error('Error uploading audio:', err);
-                    alert('Error uploading audio. Please try again.');
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('response').textContent = 'Error uploading audio';
                 });
+                // .then(response => response.json())
+                // .then(data => {
+                //     document.getElementById('response').textContent = data.response || data.error;
+                // })
+                // .catch(err => {
+                //     console.error('Error uploading audio:', err);
+                //     alert('Error uploading audio. Please try again.');
+                // });
         };
 
         mediaRecorder.start();
